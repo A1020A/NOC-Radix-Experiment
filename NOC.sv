@@ -8,13 +8,38 @@ module NOC_N3XT
     parameter NETWORK_DEPTH = 1,
     parameter ADDR_WIDTH = 32)
   (input logic clk, rst_l,
+   input logic en_M2C_IN,
    input logic [BIT_WIDTH-1:0] Data_M2C_IN,
    input logic [$clog2(RADIX)*NETWORK_DEPTH:0] AccessComplete_M2C_IN,
+   input logic [$clog2(RADIX)-1:0] en_C2M_IN,
    input logic [$clog2(RADIX)-1:0][BIT_WIDTH-1:0] Data_C2M_IN,
    input logic [$clog2(RADIX)-1:0][ADDR_WIDTH-1:0] Addr_C2M_IN,
-   input logic [$clog2(RADIX)-1:0] en_C2M_IN);
+   output logic en_M2C_OUT,
+   output logic [BIT_WIDTH-1:0] Data_M2C_OUT,
+   output logic [$clog2(RADIX)*NETWORK_DEPTH:0] AccessComplete_M2C_OUT,
+   output logic en_C2M_OUT, 
+   output logic [BIT_WIDTH-1:0] Data_C2M_OUT,
+   output logic [ADDR_WIDTH-1:0] Addr_C2M_OUT);
+  logic [$clog2(RADIX)-1:0][BIT_WIDTH+ADDR_WIDTH-1:0] Data_Addr_C2M_Latched;
+  logic [BIT_WIDTH + $clog2(RADIX)*NETWORK_DEPTH] Data_AccessComplete_M2C_Latched;
+  logic mux_sel, demux_sel;
+  genvar i;
+  generate
+    for (i = 0; i < RADIX; i++) begin
+      Buffer #(BIT_WIDTH+ADDR_WIDTH) Input_Port_Buffer(.clk, .rst_l, .en(en_C2M_IN[i]), .Buff_In({Data_C2M_IN[i], Addr_C2M_IN[i]}), .Buff_Out());
+    end
+  endgenerate
+
+  Buffer #(BIT_WIDTH + $clog2(RADIX)*NETWORK_DEPTH+1) Read_Data_Buffer(.clk, .rst_l, .en())
+
+  Destination_Decoder #(ADDR_WIDTH, RADIX, NETWORK_DEPTH) Dest_Decode(.clk, .rst_l, .en_C2M_IN, .AccessComplete_M2C_IN, .en_C2M_OUT, 
+                                                                      .mux_sel, .demux_sel, .AccessComplete_M2C_OUT);
   
+  Mux2to1 #(BIT_WIDTH+ADDR_WIDTH) DestinationMux(.Input_Vector(Data_Addr_C2M_Latched), .Sel(mux_sel), .Output_Vector({Data_C2M_OUT, Addr_C2M_OUT}));
+
+  DeMux2to1 #(BIT_WIDTH+ADDR_WIDTH) DestinationDeMux(.Input_Vector(), .Sel, .Output_Vector())
 endmodule
+
 
 module Destination_Decoder
   #(parameter ADDR_WIDTH = 32,

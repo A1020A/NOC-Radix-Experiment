@@ -6,7 +6,7 @@ module Buffer
    output logic [BIT_WIDTH-1:0] Buff_Out);
   always_ff @(posedge clk, negedge rst_l) begin
     if (~rst_l) begin
-      Buff_Out <= {BIT_WIDTH{1'b0}}
+      Buff_Out <= {BIT_WIDTH{1'b0}};
     end
     else if (en) begin
       Buff_Out <= Buff_In;
@@ -37,7 +37,7 @@ module Mux2to1
   (input logic [1:0][BIT_WIDTH-1:0] Input_Vector,
    input logic Sel,
    output logic [BIT_WIDTH-1:0] Output_Vector);
-  assign Output_Vector = Sel ? Input_Vector[1] : Input_Vector[0]
+  assign Output_Vector = Sel ? Input_Vector[1] : Input_Vector[0];
 endmodule
 
 
