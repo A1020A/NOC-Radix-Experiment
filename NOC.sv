@@ -85,9 +85,5 @@ module Destination_Decoder
     demux_sel = AccessComplete_M2C_IN[$clog2(RADIX):1];
     AccessComplete_M2C_OUT = {$clog2(RADIX)'d0, AccessComplete_M2C_IN[$clog2(RADIX)*NETWORK_DEPTH:$clog2(RADIX)+1], AccessComplete_M2C_IN[1]};
   end
-  
-  
-
-
 endmodule
 
