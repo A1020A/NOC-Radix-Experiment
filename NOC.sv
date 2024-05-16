@@ -2,31 +2,12 @@
 /***
 single memory responding to mutiple cores
 ***/
-`define DATA_WIDTH 128 // start with smaller num
-`define RADIX_IN 2
-`define RADIX_OUT 2
-`define ADDR_WIDTH 16
+`define DATA_WIDTH 16 // start with smaller num
+`define RADIX_IN 4
+`define RADIX_OUT 4
+`define ADDR_WIDTH 4
 `define DEPTH 2
 `define NETWORK_DEPTH 2
-
-// module CrossBar #(
-//   parameter RADIX_IN = 2,
-//   parameter RADIX_OUT = 2,
-//   parameter BIT_WIDTH = `DATA_WIDTH + `ADDR_WIDTH
-// ) (
-//   input logic [RADIX_IN-1:0][BIT_WIDTH-1:0] FIFO_C2M_DATA_mid1,
-//   output logic [RADIX_OUT-1:0][BIT_WIDTH-1:0] FIFO_C2M_DATA_mid2,
-//   input logic [RADIX_OUT-1:0][RADIX_IN-1:0] Matrix_Sel
-// );
-// genvar i, j;
-// generate
-//   for (i = 0; i < RADIX_IN; i++) begin
-//     for (j = 0; j < RADIX_IN; j++) begin
-//       Mux2to1 #(BIT_WIDTH) mux(.Input_Vector({FIFO_C2M_DATA_mid1[i], BIT_WIDTH'0}), .Output_Vector(FIFO_C2M_DATA_mid2[j]), .Sel(Matrix_Sel[i][j]));
-//     end
-//   end
-// endgenerate
-// endmodule CrossBar
 
 
 module Arbiter #(
@@ -196,8 +177,6 @@ module NOC_CrossBar #(
   logic [RADIX_IN-1:0] FIFO_empty_mid1;
   logic [RADIX_IN-1:0][RADIX_OUT-1:0] Matrix_Request;
   logic [RADIX_OUT-1:0][RADIX_IN-1:0] Matrix_Request_Transpose;
-  logic [RADIX_OUT-1:0] FIFO_full_mid1;
-  logic [RADIX_OUT-1:0] FIFO_enq_mid1;
   logic [RADIX_OUT-1:0][$clog2(RADIX_IN)-1:0] Mux_Sel;
   
   genvar i, j;
@@ -230,7 +209,7 @@ module NOC_CrossBar #(
     for (j = 0; j < RADIX_OUT; j++) begin
       RoundRobinArbiter #(RADIX_OUT) Arbiter(.clk(clk), .rst_l(rst_l), 
                                          .request(Matrix_Request_Transpose[j]), .deq(FIFO_deq_mid1_Transpose[j]),
-                                         .FIFO_FULL(FIFO_FULL_downstream[j]), .FIFO_ENQ(FIFO_enq_mid1[j]),
+                                         .FIFO_FULL(FIFO_FULL_downstream[j]), .FIFO_ENQ(FIFO_ENQ_downstream[j]),
                                          .mux_sel(Mux_Sel[j]));
 
       Mux #(RADIX_OUT, ADDR_WIDTH+DATA_WIDTH) NOC_Mux(.Input_Vector(FIFO_DATA_mid1), .Sel(Mux_Sel[j]), 
@@ -238,7 +217,17 @@ module NOC_CrossBar #(
     end
   endgenerate
 
-  
+  // initial begin
+    // $dumpfile("NOC_cocotb.vcd");
+    // $dumpvars();
+  // end
+endmodule
+
+module vcs_vcd_dump();
+    initial begin
+      $dumpfile("NOC_cocotb.vcd");
+      $dumpvars(1, NOC_cocotb);
+    end
 endmodule
 
 
