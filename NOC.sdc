@@ -28,7 +28,8 @@ set_max_delay $CLK_PERIOD -from [all_inputs] -to [all_outputs]
 
 # Set load at every output pin (eg. 25fF). Express the number in library units.
 # report_lib command will provide the units used in the library.
-set_load 0.025 [all_outputs]
+# set_load 0.025 [all_outputs]
+set_load 0.002 [all_outputs]
 
 # Set the driver cells for the inputs (or) set_input_transition depending on requirment
 set_driving_cell -lib_cell BUFX2 [get_db [get_db ports -if {.direction=="in" && .name!="$CLK_PORT_NAME"}] .name]
