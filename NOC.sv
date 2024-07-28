@@ -7,7 +7,7 @@ single memory responding to mutiple cores
 `define RADIX_IN 4
 `define RADIX_OUT 8
 `define DEPTH 2
-`define NETWORK_DEPTH 2
+`define NETWORK_DEPTH 1
 
 module NOC_unit #(
   parameter RADIX_IN = `RADIX_IN,
@@ -372,3 +372,4 @@ module Pipeline_Register #(
   assign data_out = data_in;
 `endif
 endmodule
+

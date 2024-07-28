@@ -9,9 +9,10 @@ EXTRA_ARGS += -access +rwc -input shmdump.tcl
 # COCOTB_HDL_TIMEPRECISION = 1ps
 
 VERILOG_SOURCES += $(PWD)/NOC.sv
+VERILOG_SOURCES += $(PWD)/NOC_Net.sv
 
 # TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
-TOPLEVEL = NOC
+TOPLEVEL = NOC_unit
 
 # MODULE is the basename of the Python test file
 MODULE = NOC_cocotb
@@ -24,7 +25,7 @@ DATA_WIDTH ?= 32
 RADIX_IN ?= 4
 RADIX_OUT ?= 8
 DEPTH ?= 2
-NETWORK_DEPTH ?= 2
+NETWORK_DEPTH ?= 1
 VERBOSE ?= 0
 
 # Mem files
